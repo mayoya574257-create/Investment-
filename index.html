@@ -414,14 +414,11 @@
     document.getElementById("tx-row").style.display = "none";
 
     try {
-      // ── Encode requestAdvice() ──────────────────────────────────────────
-      const selector = "0x" + await sha256("requestAdvice()").then(hash =>
-        hash.slice(0, 8)
-      );
-      // Use proper ABI selector
-      const data = "0xfb7d7e04"; // keccak256("requestAdvice()")[0:4]
+      // ── requestAdvice() selector: keccak256("requestAdvice()")[0:4] ─────
+      const data = "0xafcd7122"; // verified correct selector
 
-      const feeHex = "0x" + (BigInt(Math.round(parseFloat(ADVICE_FEE) * 1e18))).toString(16);
+      // 0.0001 ETH = 100000000000000 wei — use BigInt, never floats
+      const feeHex = "0x" + BigInt("100000000000000").toString(16); // = 0x5AF3107A4000
 
       const txHash = await window.ethereum.request({
         method: "eth_sendTransaction",
@@ -430,7 +427,7 @@
           to: CONTRACT_ADDRESS,
           value: feeHex,
           data: data,
-          gas: "0x15F90" // 90000
+          gas: "0x186A0" // 100000 — enough for storage writes
         }]
       });
 
