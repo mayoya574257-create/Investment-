@@ -414,20 +414,16 @@
     document.getElementById("tx-row").style.display = "none";
 
     try {
-      // ── requestAdvice() selector: keccak256("requestAdvice()")[0:4] ─────
-      const data = "0xafcd7122"; // verified correct selector
-
-      // 0.0001 ETH = 100000000000000 wei — use BigInt, never floats
-      const feeHex = "0x" + BigInt("100000000000000").toString(16); // = 0x5AF3107A4000
+      // Send 0.0001 ETH via receive() fallback — no selector needed, no revert risk
+      const feeHex = "0x5AF3107A4000"; // exactly 100000000000000 wei = 0.0001 ETH
 
       const txHash = await window.ethereum.request({
         method: "eth_sendTransaction",
         params: [{
           from: account,
           to: CONTRACT_ADDRESS,
-          value: feeHex,
-          data: data,
-          gas: "0x186A0" // 100000 — enough for storage writes
+          value: feeHex
+          // no data field = triggers receive() payable fallback directly
         }]
       });
 
